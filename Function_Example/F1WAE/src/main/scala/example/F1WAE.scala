@@ -63,8 +63,14 @@ object Substituter {
 
 object Interpreter {
   
-  def lookupFunDef(name: Symbol, funDefs: List[FunDef]): FunDef =
-    funDefs.find(_.funName == name).getOrElse(throw new Exception(s"Unknown function: $name"))
+  def lookupFunDef(name: Symbol, funDefs: List[FunDef]): FunDef = {
+    funDefs match {
+      case Nil => throw new Exception(s"Unknown function: $name")
+      case head :: tail =>
+        if (head.funName == name) head
+        else lookupFunDef(name, tail)
+    }
+  }
 
   def interp(wae: F1WAE, funDefs: List[FunDef] = List()): Int = wae match {
     case Num(n) => n
